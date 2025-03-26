@@ -8,7 +8,7 @@ from nba_api.stats.static import players
 from nba_api.stats.endpoints import playergamelog
 
 # Get a player's unique NBA metdata from their name
-def get_player_metadata(full_name):
+def get_player_id(full_name):
     player_list = players.get_players()
     for player in player_list:
         if player['full_name'] == full_name:
@@ -61,17 +61,9 @@ def add_game_features(df):
 
     return df
 
-# Add opponent team defense rating (if provided)
-def add_defense_rating(df, team_defense_ratings):
-    if team_defense_ratings:
-        df['OPP_DEF_RATING'] = df['OPPONENT'].map(team_defense_ratings)
-    else:
-        df['OPP_DEF_RATING'] = np.nan
-    return df
-
 # Full pipeline to build a dataset for one player
 def build_player_dataset(player_name, season='2024', team_defense_ratings=np.nan):
-    player_id = get_player_metadata(player_name)
+    player_id = get_player_id(player_name)
     if player_id is None or pd.isna(player_id):
         print(f"Player '{player_name}' not found.")
         return pd.DataFrame()
@@ -131,28 +123,6 @@ def add_injury_status(df, injury_df):
     df['INJURY_STATUS'] = df['INJURY_STATUS'].fillna('Active')
     return df
 
-def debug_injury_tables():
-    import ssl
-    import urllib.request
-    import pandas as pd
-
-    url = 'https://www.espn.com/nba/injuries'
-    try:
-        context = ssl._create_unverified_context()
-        html = urllib.request.urlopen(url, context=context).read()
-        tables = pd.read_html(html)
-    except Exception as e:
-        print("Error reading ESPN injury page:", e)
-        return
-
-    print(f"Found {len(tables)} tables.")
-
-    for i, table in enumerate(tables):
-        print(f"\nTable {i} preview:")
-        print(table.head())
-        print("Columns:", list(table.columns))
-
-
 def build_multi_player_dataset(player_names, season='2024', team_defense_ratings=np.nan):
     all_data = []
 
@@ -189,8 +159,6 @@ def reorder_columns(df):
     actual_order = [col for col in preferred_order if col in df.columns]
     rest = [col for col in df.columns if col not in actual_order]
     return df[actual_order + rest]
-
-
 
 def main():
     player_list = ['LeBron James', 'Stephen Curry', 'Kevin Durant', 'Jayson Tatum', 'Luka Dončić']
