@@ -161,7 +161,7 @@ def reorder_columns(df):
     return df[actual_order + rest]
 
 def main():
-    player_list = ['LeBron James', 'Stephen Curry', 'Kevin Durant', 'Jayson Tatum', 'Luka Dončić']
+    player_list = ['LeBron James', 'Stephen Curry', 'Kevin Durant', 'Jayson Tatum', 'Luka Dončić', 'Miles Bridges', 'Karl-Anthony Towns', 'Victor Wembanyama']
     season = '2024'
 
     print("Scraping current injury data from ESPN...")
